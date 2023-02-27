@@ -9,6 +9,8 @@ let currentRequestStatus = RequestStatus.NONE,
     allowedConnections = 10, 
     loaderCircumference;
 
+const tab = await getActiveTabURL();
+
 setDefaultView();
 
 function manageLinkedInConnections() {
@@ -32,33 +34,38 @@ function manageLinkedInConnections() {
 }
 
 async function startLinkedInConnections() {
-  await sendConnectionRequest()
-  // while (completedConnectionsCount <= allowedConnections) {
-  //   sendConnectionRequest()
-  //   .then(data => setCountView(data));
-  // }
-  // completedLinkedInConnections();
+  startConnectionRequest()
+  .then(response => {
+    completedConnectionsCount = response;
+    setCountView()
+    completedLinkedInConnections();
+  });
 }
 
-async function sendConnectionRequest() {
-  const tab = await getActiveTabURL();
-  const response = await chrome.tabs.sendMessage(tab.id, { action: 'start-connecting', title: 'Start Connecting', message: 'LinkedIn Connection Requests Sent Successfully!' });
-  console.log(response);
-  // chrome.runtime.sendMessage({ action: 'startConnecting', title: 'Start Connecting', message: 'LinkedIn Connection Requests Sent Successfully!' });
-  // return new Promise(resolve => {
-  //   let data = chrome.runtime.sendMessage({ action: 'startConnecting', allowedConnections: allowedConnections });
-  //   console.log(data);
-  //   resolve(10);
-  // });
+async function startConnectionRequest() {
+  return await chrome.tabs.sendMessage(tab.id, { action: 'start-connecting' });
 }
 
-function resumeLinkedInConnections() {
-  startLinkedInConnections();
+async function resumeLinkedInConnections() {
+  resumeConnectionRequest()
+  .then(response => {
+    completedLinkedInConnections();
+  });
 }
 
-function stopLinkedInConnections() {
-  // code here
-  completedLinkedInConnections();
+async function resumeConnectionRequest() {
+  return await chrome.tabs.sendMessage(tab.id, { action: 'resume-connecting' });
+}
+
+async function stopLinkedInConnections() {
+  stopConnectionRequest()
+  .then(response => {
+    completedLinkedInConnections();
+  });
+}
+
+async function stopConnectionRequest() {
+  return await chrome.tabs.sendMessage(tab.id, { action: 'stop-connecting' });
 }
 
 function completedLinkedInConnections() {
@@ -97,7 +104,7 @@ function setLoaderView() {
 }
 
 function showSuccessNotification() {
-  chrome.runtime.sendMessage({ action: 'createNotification', title: 'Success', message: 'LinkedIn Connection Requests Sent Successfully!' });
+  chrome.runtime.sendMessage({ action: 'create-notification', title: 'Success', message: 'LinkedIn Connection Requests Sent Successfully!' });
 }
 
 function setDefaultView() {

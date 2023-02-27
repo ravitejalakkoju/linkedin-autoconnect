@@ -22,7 +22,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // registers a listener to receive messages from other parts of the extension
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.action === 'createNotification') {
+  if (request.action === 'create-notification') {
     chrome.notifications.create({
       type: 'basic',
       iconUrl: '../assets/logo-48.png',

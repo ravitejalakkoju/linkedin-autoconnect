@@ -6,10 +6,3 @@ export async function getActiveTabURL() {
   
     return tabs[0];
 }
-
-export const EventAction = {
-    StartConnecting: 'start-connecting',
-    ResumeConnecting: 'resume-connecting',
-    StopConnecting: 'stop-connecting',
-    CreateNotification: 'create-notification'
-}

@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn AutoConnect",
+  "version": "1.0",
+  "host_permissions": ["https://www.linkedin.com/search/results/people/*"],
+  "permissions": ["tabs", "scripting", "notifications", "declarativeContent"],
+  "icons": {
+    "16": "assets/icon-16.png",
+    "24": "assets/icon-24.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-64.png"
+  },
+  "action": {
+    "default_icon": "assets/icon-16.png",
+    "default_popup": "popup/popup.html",
+    "default_title": "AutoConnect to LinkedIn profiles",
+    "matches": ["https://www.linkedin.com/search/results/people/*"]
+  },
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/icon-16.png",
+        "assets/icon-24.png",
+        "assets/icon-32.png"
+      ],
+      "matches": ["https://www.linkedin.com/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/search/results/people/*"],
+      "js": ["scripts/content.js"]
+    }
+  ],
+  "description": "Send connection requests to relevant LinkedIn profiles automatically, helping professionals expand their network with ease.",
+  "author": "ravitejal.creator@gmail.com" 
+}

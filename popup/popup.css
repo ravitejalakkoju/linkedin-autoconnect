@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500&display=swap');
+
+* {
+  font-family: Poppins;
+  margin: 0;
+  padding: 0;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+.card {
+  min-width: 300px;
+/*  box-shadow: 0 0 3px 3px #CACCCE;*/
+  border-radius: 1rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  font-size: 1.25rem;
+}
+
+.fw-300 {
+  font-weight: 300;
+}
+
+.fw-500 {
+  font-weight: 500;
+}
+
+.fa-linkedin {
+  color: #0077B5;
+  font-size: 1.75rem;
+}
+
+.options {
+  display: flex;
+  align-items: center;
+}
+
+.btn {
+  font-size: 1rem;
+  display:block;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  border-radius: 50%;
+  border: none;
+}
+
+.btn-ellipsis {
+  display: flex;
+  gap: 0.1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close {
+  background-color: transparent;
+  margin-left: 0.5rem;
+}
+
+i {
+  display:block;
+  padding-top: 2px;
+}
+
+.dot {
+  width: 0.25rem;
+  height: 0.15rem;
+  background: #86888A;
+  border-radius: 50%;
+}
+
+.main-card {
+  background-color: rgba(202, 204, 206, 0.2);
+  border-radius: inherit;
+  padding: 1.5rem 1rem;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heading-2 {
+  font-size: 1rem;
+}
+
+.loader {
+  margin: 0.5rem 0;
+  position: relative;
+}
+
+.progress-ring {
+  box-sizing: border-box;
+}
+
+.invitation-count {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+.btn-action {
+  padding: 0.5rem;
+  border-radius: inherit;
+  border: none;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-sizing: border-box;
+  width: 70%;
+}
+
+.btn-blue {
+  background-color: #0077B5;
+  color: #FFFFFF;
+}
+
+.btn-blue:hover {
+  box-shadow: 0 0 1px 1px #0077B5;
+  background: none;
+  color: #0077B5;
+  box-sizing: border-box;
+}
+
+.btn-red {
+  background-color: red;
+  color: #FFFFFF;
+}
+
+.btn-red:hover {
+  box-shadow: 0 0 1px 1px red;
+  background: none;
+  color: red;
+  box-sizing: border-box;
+}
+
+.btn-disabled {
+  pointer-events: none;
+  background-color: transparent;
+  color: lightgray;
+  box-shadow: 0 0 1px 1px lightgray;
+}
+
+/* Loader */
+
+.progress-ring__circle {
+  transition: 0.35s stroke-dashoffset;
+  transform: rotate(-90deg) !important;
+  stroke: #0077B5;
+  transform-origin: 50% 50%;
+}

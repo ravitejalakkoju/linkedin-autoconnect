@@ -13,6 +13,12 @@ const tab = await getActiveTabURL();
 
 setDefaultView();
 
+// var port = chrome.runtime.connect(null, {name: "connections"});
+// port.onMessage.addListener((response) => {
+//   console.log("Message received from content script: " + response);
+// });
+// port.postMessage({ action: 'start-connecting' });
+
 function manageLinkedInConnections() {
   const prevRequestStatus = currentRequestStatus;
   switch(prevRequestStatus) {
@@ -44,6 +50,7 @@ async function startLinkedInConnections() {
 
 async function startConnectionRequest() {
   return await chrome.tabs.sendMessage(tab.id, { action: 'start-connecting' });
+  // await port.postMessage({ action: 'start-connecting' });
 }
 
 async function resumeLinkedInConnections() {
@@ -55,6 +62,7 @@ async function resumeLinkedInConnections() {
 
 async function resumeConnectionRequest() {
   return await chrome.tabs.sendMessage(tab.id, { action: 'resume-connecting' });
+  // await port.postMessage({ action: 'resume-connecting' });
 }
 
 async function stopLinkedInConnections() {
@@ -66,6 +74,7 @@ async function stopLinkedInConnections() {
 
 async function stopConnectionRequest() {
   return await chrome.tabs.sendMessage(tab.id, { action: 'stop-connecting' });
+  // await port.postMessage({ action: 'stop-connecting' });
 }
 
 function completedLinkedInConnections() {

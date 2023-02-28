@@ -19,17 +19,19 @@
 					const connectBtnList = Array.from(document.querySelectorAll('.search-results-container .entity-result__item .entity-result__actions button'))
 											.filter(btn => btn.ariaLabel.includes('Invite'));
 
-			      	connectBtnList.forEach(connectBtn => {
-						if(completedConnectionsCount < 2) {
-							connectBtn.click();
-							new Promise(resolve => setTimeout(resolve, 500))
-							.then(() => {
-								document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]').click();
-						  		completedConnectionsCount++;
-						  		port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
-							})
-							
-						}
+			      	connectBtnList.forEach((connectBtn, index) => {
+			      		setTimeout(() => {
+			      			if(completedConnectionsCount < allowedConnections) {
+								connectBtn.click();
+								new Promise(resolve => setTimeout(resolve, index * 250))
+								.then(() => {
+									document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]').click();
+							  		completedConnectionsCount++;
+							  		port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
+								});
+							}
+			      		}, index * 500);
+						
 					});
 				}
 				else if (request.action === 'resume-connecting') {

@@ -17,26 +17,25 @@
 				}
 		      	else if (request.action === 'start-connecting') {
 					const connectBtnList = Array.from(document.querySelectorAll('.search-results-container .entity-result__item .entity-result__actions button'))
-											.filter(btn => !btn.ariaLabel.includes('Withdraw'));
+											.filter(btn => !btn.ariaLabel?.includes('Withdraw'));
 
 			      	connectBtnList.forEach((connectBtn, index) => {
-			      		setTimeout(() => {
-			      			if(completedConnectionsCount < connectBtnList.length) {
-								connectBtn.click();
-								if(connectBtn.ariaLabel.includes('Invite')) {
-									setTimeout(() => {
-										document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]').click();
-								  		completedConnectionsCount++;
-								  		port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
-									}, index * 250);
-								}
-								else {
-									completedConnectionsCount++;
-									port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)})
-								}
-							}
-			      		}, index * 1000);
-						
+			      		connectBtn.addEventListener('click', event => {
+			      			setTimeout(() => {
+			      				const sendNowNode = document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]')
+			      				if(sendNowNode) {
+			      					sendNowNode.click();
+			      				}
+				      			completedConnectionsCount++;
+								port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
+			      			}, 0);
+			      		})
+					});
+
+					connectBtnList.forEach((connectBtn, index) => {
+						setTimeout(() => {
+							connectBtn.click();
+						}, index * 500);
 					});
 				}
 				else if (request.action === 'resume-connecting') {
@@ -58,6 +57,8 @@
 				}
 		    });
 		}
+
+
 	});
 
 	function connectToProfile(connectBtn) {

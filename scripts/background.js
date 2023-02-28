@@ -60,6 +60,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url && tab.url.includes('linkedin.com/search/results/people')) {
-    
+    chrome.tabs.sendMessage(tab.id, {action: 'tab-updated'});
   }
 });

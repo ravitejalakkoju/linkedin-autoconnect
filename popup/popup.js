@@ -14,13 +14,13 @@ let port = chrome.tabs.connect(tab.id, {name: "connections"});
 port.postMessage({ action: 'get-default-data' });
 
 port.onMessage.addListener((response) => {
-  console.log(response);
-  if(response.message === 'connected') {
+  if(response.message === 'default' || response.message === 'connected') {
     setCurrentRequestStatus(response.completedConnectionsCount);
     setCountView(response.completedConnectionsCount);
     setProgressView(response.percent);
-    if(response.completedConnectionsCount == allowedConnections)
-      completedLinkedInConnections();
+    if(response.percent === 100) {
+      actionButtonElement.classList.add('btn-disabled');
+    }
   }
   else if(response.message === 'stopped') {
     actionButtonElement.classList.add('btn-disabled');
@@ -28,6 +28,8 @@ port.onMessage.addListener((response) => {
       actionButtonElement.classList.remove('btn-disabled');
     }, response.pendingConnections * 250 + 250);
   }
+  else if(response.message === 'completed')
+    completedLinkedInConnections();
 });
 
 chrome.runtime.sendMessage({ action: 'get-sync-key', key: 'allowed-connections' }, response => {
@@ -71,12 +73,6 @@ function completedLinkedInConnections() {
   currentRequestStatus = RequestStatus.COMPLETED;
   toggleActionButtonView(prevRequestStatus);
   showSuccessNotification();
-}
-
-async function setAllowedConnections(value = 10) {
-  await chrome.runtime.sendMessage({ action: 'set-sync-key', key: 'allowed-connections', value: value }, response => {
-    allowedConnections = response;
-  });
 }
 
 function setCurrentRequestStatus(completedConnectionsCount) {

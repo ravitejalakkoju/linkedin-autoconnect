@@ -1,15 +1,18 @@
 (() => {
-	let completedConnectionsCount = 0, allowedConnections, isHalted = false;
+	let completedConnectionsCount = 0, totalConnections = 10, isHalted = false;
 
-	chrome.runtime.sendMessage({ action: 'get-sync-key', key: 'allowed-connections' }, response => {
-		allowedConnections = response;
-	});
+	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+		if(request.action === 'tab-updated') {
+			completedConnectionsCount = 0;
+		}
+	})
 
 	chrome.runtime.onConnect.addListener(function(port) {
 		if(port.name === 'connections') {
 			port.onMessage.addListener(function(request) {
 				if(request.action === 'get-default-data') {
-					port.postMessage({completedConnectionsCount, percent: calculatePercent()});
+					completedConnectionsCount = 10 - getConnectBtnList().length;
+					port.postMessage({message: 'default', completedConnectionsCount, percent: calculatePercent()});
 				}
 		      	else if (request.action === 'start-connecting') {
 		      		const connectBtnList = getConnectBtnList();
@@ -23,7 +26,11 @@
 			      				}
 
 				      			completedConnectionsCount++;
-								port.postMessage({message: 'connected', completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
+								port.postMessage({message: 'connected', completedConnectionsCount, totalConnections, percent: calculatePercent()});
+
+								if(completedConnectionsCount === totalConnections) {
+				      				port.postMessage({message: 'completed'});
+				      			}
 			      			}, 0);
 			      		})
 					});
@@ -60,21 +67,11 @@
 
 		function getConnectBtnList() {
 			return Array.from(document.querySelectorAll('.search-results-container .entity-result__item .entity-result__actions button'))
-											.filter(btn => !btn.ariaLabel?.includes('Withdraw'));
+											.filter(btn => !btn.classList.contains('artdeco-button--muted') && !btn.querySelector('.artdeco-button__text').innerHTML.includes('Message'));
 		}
 
+		function calculatePercent() {
+		  return Math.round((completedConnectionsCount / totalConnections) * 100);
+		}
 	});
-
-	function connectToProfile(connectBtn) {
-		console.log(completedConnectionsCount)
-		return 
-		new Promise(resolve => setTimeout(() => connectBtn.click(), 100))
-		.then(() => document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]').click())
-		.then(() => completedConnectionsCount++)
-
-	}
-
-	function calculatePercent(totalConnections) {
-	  return Math.round((completedConnectionsCount / (totalConnections || allowedConnections) ) * 100);
-	}
 })();

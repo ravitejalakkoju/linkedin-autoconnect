@@ -1,5 +1,5 @@
 import { getActiveTabURL } from '../scripts/utils.js';
-import { RequestStatus, ActionButtonView, EventAction } from './types.js';
+import { RequestStatus, ActionButtonView } from './types.js';
 
 let currentRequestStatus = RequestStatus.NONE,
     actionButtonElement = document.getElementById('js-button-action'),

@@ -23,10 +23,3 @@ export const ActionButtonView = {
         name: 'Start Connecting'
     }
 }
-
-export const EventAction = {
-    StartConnecting: 'start-connecting',
-    ResumeConnecting: 'resume-connecting',
-    StopConnecting: 'stop-connecting',
-    CreateNotification: 'create-notification'
-}

@@ -4,8 +4,7 @@ import { RequestStatus, ActionButtonView } from './types.js';
 let currentRequestStatus = RequestStatus.NONE,
     actionButtonElement = document.getElementById('js-button-action'),
     closeButtonElement = document.getElementById('js-btn-close'),
-    circle = document.querySelector('circle'),
-    allowedConnections;
+    circle = document.querySelector('circle');
 
 setLoaderView();
 
@@ -30,10 +29,6 @@ port.onMessage.addListener((response) => {
   }
   else if(response.message === 'completed')
     completedLinkedInConnections();
-});
-
-chrome.runtime.sendMessage({ action: 'get-sync-key', key: 'allowed-connections' }, response => {
-  allowedConnections = response;
 });
 
 function manageLinkedInConnections() {

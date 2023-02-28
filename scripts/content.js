@@ -1,9 +1,5 @@
 (() => {
-	let completedConnectionsCount = 0, allowedConnections;
-
-	// chrome.runtime.sendMessage({ action: 'set-session-key', key: 'completed-connections-count', value: 0 }, response => {
-	// 	completedConnectionsCount = response;
-	// });
+	let completedConnectionsCount = 0, allowedConnections, isHalted = false;
 
 	chrome.runtime.sendMessage({ action: 'get-sync-key', key: 'allowed-connections' }, response => {
 		allowedConnections = response;
@@ -16,8 +12,7 @@
 					port.postMessage({completedConnectionsCount, percent: calculatePercent()});
 				}
 		      	else if (request.action === 'start-connecting') {
-					const connectBtnList = Array.from(document.querySelectorAll('.search-results-container .entity-result__item .entity-result__actions button'))
-											.filter(btn => !btn.ariaLabel?.includes('Withdraw'));
+		      		const connectBtnList = getConnectBtnList();
 
 			      	connectBtnList.forEach((connectBtn, index) => {
 			      		connectBtn.addEventListener('click', event => {
@@ -26,38 +21,47 @@
 			      				if(sendNowNode) {
 			      					sendNowNode.click();
 			      				}
+
 				      			completedConnectionsCount++;
-								port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
+								port.postMessage({message: 'connected', completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
 			      			}, 0);
 			      		})
 					});
 
-					connectBtnList.forEach((connectBtn, index) => {
-						setTimeout(() => {
-							connectBtn.click();
-						}, index * 500);
-					});
-				}
-				else if (request.action === 'resume-connecting') {
-					const connectBtnList = Array.from(document.querySelectorAll('.search-results-container .entity-result__item .entity-result__actions button'))
-											.filter(btn => btn.ariaLabel.includes('Invite'));
+					for (let i = 0; i < connectBtnList.length; i++) {
+						const connectBtn = connectBtnList[i];
 
-					connectBtnList.forEach(connectBtn => {
-						if(completedConnectionsCount < connectBtnList.length) {
-							// connectBtn.click();
-							console.log(document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]'))
-							completedConnectionsCount++;
-						}
-						port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});	
-					});
+						setTimeout(() => {
+							if(isHalted) return;
+							connectBtn.click();
+						}, i * 250);
+					}
+				}
+				else if(request.action === 'resume-connecting') {
+		      		isHalted = false;
+
+		      		const connectBtnList = getConnectBtnList();
+
+					for (let i = 0; i < connectBtnList.length; i++) {
+						const connectBtn = connectBtnList[i];
+
+						setTimeout(() => {
+							if(isHalted) return;
+							connectBtn.click();
+						}, i * 250);
+					}
 				}
 				else if (request.action === 'stop-connecting') {
-					completedConnectionsCount;
-					port.postMessage({completedConnectionsCount, percent: calculatePercent()});	
+					isHalted = true;
+					port.postMessage({message: 'stopped', pendingConnections: getConnectBtnList().length});	
 				}
 		    });
 		}
 
+		function getConnectBtnList() {
+			return Array.from(document.querySelectorAll('.search-results-container .entity-result__item .entity-result__actions button'))
+											.filter(btn => !btn.ariaLabel?.includes('Withdraw'));
+		}
 
 	});
 

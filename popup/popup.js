@@ -15,11 +15,19 @@ port.postMessage({ action: 'get-default-data' });
 
 port.onMessage.addListener((response) => {
   console.log(response);
-  setCurrentRequestStatus(response.completedConnectionsCount);
-  setCountView(response.completedConnectionsCount);
-  setProgressView(response.percent);
-  if(response.completedConnectionsCount == allowedConnections)
-    completedLinkedInConnections();
+  if(response.message === 'connected') {
+    setCurrentRequestStatus(response.completedConnectionsCount);
+    setCountView(response.completedConnectionsCount);
+    setProgressView(response.percent);
+    if(response.completedConnectionsCount == allowedConnections)
+      completedLinkedInConnections();
+  }
+  else if(response.message === 'stopped') {
+    actionButtonElement.classList.add('btn-disabled');
+    setTimeout(() => {
+      actionButtonElement.classList.remove('btn-disabled');
+    }, response.pendingConnections * 250 + 250);
+  }
 });
 
 chrome.runtime.sendMessage({ action: 'get-sync-key', key: 'allowed-connections' }, response => {
@@ -72,7 +80,7 @@ async function setAllowedConnections(value = 10) {
 }
 
 function setCurrentRequestStatus(completedConnectionsCount) {
-  
+
 }
 
 // Views

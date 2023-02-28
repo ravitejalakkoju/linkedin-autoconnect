@@ -18,13 +18,13 @@ port.onMessage.addListener((response) => {
     setCountView(response.completedConnectionsCount);
     setProgressView(response.percent);
     if(response.percent === 100) {
-      actionButtonElement.classList.add('btn-disabled');
+      disableButton(actionButtonElement);
     }
   }
   else if(response.message === 'stopped') {
-    actionButtonElement.classList.add('btn-disabled');
+    disableButton(actionButtonElement);
     setTimeout(() => {
-      actionButtonElement.classList.remove('btn-disabled');
+      enableButton(actionButtonElement);
     }, response.pendingConnections * 250 + 250);
   }
   else if(response.message === 'completed')
@@ -98,6 +98,14 @@ function setLoaderView() {
 
   circle.style.strokeDasharray = `${loaderCircumference} ${loaderCircumference}`;
   circle.style.strokeDashoffset = `${loaderCircumference}`;
+}
+
+function disableButton(btn) {
+  btn.classList.add('btn-disabled');
+}
+
+function enableButton(btn) {
+  btn.classList.remove('btn-disabled');
 }
 
 function getCircleCircumference() {

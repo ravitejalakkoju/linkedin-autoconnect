@@ -15,6 +15,7 @@ port.postMessage({ action: 'get-default-data' });
 
 port.onMessage.addListener((response) => {
   console.log(response);
+  setCurrentRequestStatus(response.completedConnectionsCount);
   setCountView(response.completedConnectionsCount);
   setProgressView(response.percent);
   if(response.completedConnectionsCount == allowedConnections)
@@ -68,6 +69,10 @@ async function setAllowedConnections(value = 10) {
   await chrome.runtime.sendMessage({ action: 'set-sync-key', key: 'allowed-connections', value: value }, response => {
     allowedConnections = response;
   });
+}
+
+function setCurrentRequestStatus(completedConnectionsCount) {
+  
 }
 
 // Views

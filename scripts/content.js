@@ -17,20 +17,25 @@
 				}
 		      	else if (request.action === 'start-connecting') {
 					const connectBtnList = Array.from(document.querySelectorAll('.search-results-container .entity-result__item .entity-result__actions button'))
-											.filter(btn => btn.ariaLabel.includes('Invite'));
+											.filter(btn => !btn.ariaLabel.includes('Withdraw'));
 
 			      	connectBtnList.forEach((connectBtn, index) => {
 			      		setTimeout(() => {
-			      			if(completedConnectionsCount < allowedConnections) {
+			      			if(completedConnectionsCount < connectBtnList.length) {
 								connectBtn.click();
-								new Promise(resolve => setTimeout(resolve, index * 250))
-								.then(() => {
-									document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]').click();
-							  		completedConnectionsCount++;
-							  		port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
-								});
+								if(connectBtn.ariaLabel.includes('Invite')) {
+									setTimeout(() => {
+										document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]').click();
+								  		completedConnectionsCount++;
+								  		port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)});
+									}, index * 250);
+								}
+								else {
+									completedConnectionsCount++;
+									port.postMessage({completedConnectionsCount, percent: calculatePercent(connectBtnList.length)})
+								}
 							}
-			      		}, index * 500);
+			      		}, index * 1000);
 						
 					});
 				}

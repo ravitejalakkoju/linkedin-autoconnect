@@ -16,7 +16,7 @@ The extension saves you time and effort by automating the process of connecting 
 
 ###### Class Diagram
 
-![image](https://user-images.githubusercontent.com/48471743/221475557-9a8f1709-ed3a-46d2-9398-4c25e1a093c4.png)
+![image](https://user-images.githubusercontent.com/48471743/221899409-0d434943-3371-4f00-8a34-781e95397c89.png)
 
 ##### Step-by-step guide
 

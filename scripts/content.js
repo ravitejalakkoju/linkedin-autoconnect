@@ -1,5 +1,5 @@
 (() => {
-	let completedConnectionsCount = 0, totalConnections = 10, isHalted = false;
+	let completedConnectionsCount = 0, totalConnections = 10, isHalted = false, port = null;
 
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		if(request.action === 'tab-updated') {
@@ -7,8 +7,9 @@
 		}
 	})
 
-	chrome.runtime.onConnect.addListener(function(port) {
-		if(port.name === 'connections') {
+	chrome.runtime.onConnect.addListener(function(connectionsPort) {
+		if(connectionsPort.name === 'connections') {
+			port = connectionsPort;
 			port.onMessage.addListener(function(request) {
 				if(request.action === 'get-default-data') {
 					completedConnectionsCount = 10 - getConnectBtnList().length;
@@ -63,6 +64,10 @@
 					port.postMessage({message: 'stopped', pendingConnections: getConnectBtnList().length});	
 				}
 		    });
+
+		    port.onDisconnect.addListener(() => {
+			   port = null;
+			});
 		}
 
 		function getConnectBtnList() {

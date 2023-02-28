@@ -1,27 +1,11 @@
 (() => {
-	var completedConnectionsCount = 0, allowedConnections = 3;
-	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-		if (request.action === 'start-connecting') {
-			document.querySelectorAll('.search-results-container .entity-result__item .entity-result__actions button').forEach(btn => {
-				// if(btn.ariaLabel.includes('Invite') && completedConnectionsCount <= allowedConnections){ 
-				// 	btn.click();
-				// 	setTimeout(() => {
-				// 		document.querySelector('#artdeco-modal-outlet [aria-label="Send now"]')?.click();
-				// 	}, 200);
-				// 	completedConnectionsCount++;
-				// }
-				completedConnectionsCount++;
-			});
-			sendResponse(completedConnectionsCount);
-		}
-		else if (request.action === 'resume-connecting') {
-			completedConnectionsCount++;
-			sendResponse(completedConnectionsCount);	
-		}
-		else if (request.action === 'stop-connecting') {
-			completedConnectionsCount;
-			sendResponse(completedConnectionsCount);	
-		}
+	let completedConnectionsCount, allowedConnections;
+
+	chrome.storage.session.set({ 'completed-connection-count': 0 }, () => {
+		completedConnectionsCount = 0;
+	});
+	chrome.storage.sync.get('allowed-connections', result => {
+	  allowedConnections = result['allowed-connections'];
 	});
 
 	chrome.runtime.onConnect.addListener(function(port) {

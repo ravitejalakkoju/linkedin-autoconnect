@@ -5,17 +5,20 @@ let currentRequestStatus = RequestStatus.NONE,
     actionButtonElement = document.getElementById('js-button-action'),
     closeButtonElement = document.getElementById('js-btn-close'),
     circle = document.querySelector('circle'),
-    completedConnectionsCount = 0,
-    allowedConnections = 10, 
+    completedConnectionsCount,
+    allowedConnections, 
     loaderCircumference;
 
 const tab = await getActiveTabURL();
 let port = chrome.tabs.connect(tab.id, {name: "connections"});
-port.onMessage.addListener((response) => {
-  completedConnectionsCount = response;
-  setCountView();
-  if(completedConnectionsCount == allowedConnections)
-    completedLinkedInConnections();
+
+await chrome.storage.session.get("completed-connections-count", result => {
+  completedConnectionsCount = result['completed-connections-count'];
+  console.log(completedConnectionsCount);
+});
+await chrome.storage.sync.get("allowed-connections", result => {
+  allowedConnections = result['allowed-connections'];
+  console.log(allowedConnections);
 });
 
 setDefaultView();
@@ -59,6 +62,11 @@ function completedLinkedInConnections() {
   showSuccessNotification();
 }
 
+async function setAllowedConnections(value = 10) {
+  await chrome.storage.sync.set({ 'allowed-connections': value });
+  allowedConnections = value;
+}
+
 function calculatePercent() {
   return Math.round((completedConnectionsCount / allowedConnections ) * 100);
 }
@@ -99,3 +107,9 @@ function setDefaultView() {
 // Event Listeners
 actionButtonElement.addEventListener('click', manageLinkedInConnections);
 closeButtonElement.addEventListener('click', () => window.close());
+port.onMessage.addListener((response) => {
+  completedConnectionsCount = response;
+  setCountView();
+  if(completedConnectionsCount == allowedConnections)
+    completedLinkedInConnections();
+});

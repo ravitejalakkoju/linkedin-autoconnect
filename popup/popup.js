@@ -5,23 +5,25 @@ let currentRequestStatus = RequestStatus.NONE,
     actionButtonElement = document.getElementById('js-button-action'),
     closeButtonElement = document.getElementById('js-btn-close'),
     circle = document.querySelector('circle'),
-    completedConnectionsCount,
-    allowedConnections, 
-    loaderCircumference;
+    allowedConnections;
+
+setLoaderView();
 
 const tab = await getActiveTabURL();
 let port = chrome.tabs.connect(tab.id, {name: "connections"});
+port.postMessage({ action: 'get-default-data' });
 
-await chrome.storage.session.get("completed-connections-count", result => {
-  completedConnectionsCount = result['completed-connections-count'];
-  console.log(completedConnectionsCount);
-});
-await chrome.storage.sync.get("allowed-connections", result => {
-  allowedConnections = result['allowed-connections'];
-  console.log(allowedConnections);
+port.onMessage.addListener((response) => {
+  console.log(response);
+  setCountView(response.completedConnectionsCount);
+  setProgressView(response.percent);
+  if(response.completedConnectionsCount == allowedConnections)
+    completedLinkedInConnections();
 });
 
-setDefaultView();
+chrome.runtime.sendMessage({ action: 'get-sync-key', key: 'allowed-connections' }, response => {
+  allowedConnections = response;
+});
 
 function manageLinkedInConnections() {
   const prevRequestStatus = currentRequestStatus;
@@ -63,53 +65,45 @@ function completedLinkedInConnections() {
 }
 
 async function setAllowedConnections(value = 10) {
-  await chrome.storage.sync.set({ 'allowed-connections': value });
-  allowedConnections = value;
+  await chrome.runtime.sendMessage({ action: 'set-sync-key', key: 'allowed-connections', value: value }, response => {
+    allowedConnections = response;
+  });
 }
 
-function calculatePercent() {
-  return Math.round((completedConnectionsCount / allowedConnections ) * 100);
-}
-
-// View updates
+// Views
 function toggleActionButtonView(prevRequestStatus) {
   actionButtonElement.classList.remove(ActionButtonView[prevRequestStatus].className);
   actionButtonElement.classList.add(ActionButtonView[currentRequestStatus].className);
   actionButtonElement.textContent = ActionButtonView[currentRequestStatus ].name;
 }
 
-function setCountView() {
+function setCountView(completedConnectionsCount) {
   document.getElementById('js-invitations-count').innerHTML = completedConnectionsCount;
-  setProgressView();
+  setProgressView(completedConnectionsCount);
 }
 
-function setProgressView(percent = calculatePercent()) {
+function setProgressView(percent) {
+  const loaderCircumference = getCircleCircumference();
+  
   const offset = loaderCircumference - percent / 100 * loaderCircumference;
   circle.style.strokeDashoffset = offset;
 }
 
 function setLoaderView() {
-  loaderCircumference = circle.r.baseVal.value * 2 * Math.PI;
+  const loaderCircumference = getCircleCircumference();
 
   circle.style.strokeDasharray = `${loaderCircumference} ${loaderCircumference}`;
   circle.style.strokeDashoffset = `${loaderCircumference}`;
+}
+
+function getCircleCircumference() {
+  return circle.r.baseVal.value * 2 * Math.PI;
 }
 
 function showSuccessNotification() {
   chrome.runtime.sendMessage({ action: 'create-notification', title: 'Success', message: 'LinkedIn Connection Requests Sent Successfully!' });
 }
 
-function setDefaultView() {
-  setLoaderView();
-  setCountView();
-}
-
 // Event Listeners
 actionButtonElement.addEventListener('click', manageLinkedInConnections);
 closeButtonElement.addEventListener('click', () => window.close());
-port.onMessage.addListener((response) => {
-  completedConnectionsCount = response;
-  setCountView();
-  if(completedConnectionsCount == allowedConnections)
-    completedLinkedInConnections();
-});

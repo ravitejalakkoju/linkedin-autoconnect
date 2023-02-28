@@ -32,6 +32,30 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     });
     sendResponse('notified');
   }
+  else if(request.action === 'get-session-key') {
+    chrome.storage.session.get(request.key, response => {
+      sendResponse(response[request.key]);
+    });
+    return true;
+  }
+  else if(request.action === 'set-session-key') {
+    chrome.storage.session.set({ [request.key] : request.value }, () => {
+      sendResponse(request.value);
+    });
+    return true;
+  }
+  else if(request.action === 'get-sync-key') {
+    chrome.storage.sync.get(request.key, result => {
+      sendResponse(result[request.key]);
+    });
+    return true;
+  }
+  else if(request.action === 'set-sync-key') {
+    chrome.storage.sync.set({ [request.key]: request.value }, () => {
+      sendResponse(request.value);
+    });
+    return true;
+  }
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {

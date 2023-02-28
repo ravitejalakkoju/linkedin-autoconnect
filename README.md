@@ -43,3 +43,7 @@ chromes://extensions
 - The extension will continue to connect with each profile until all profiles have been processed or until you click the "Stop Connecting" button in the popup.
 - The popup will display the number and percentage of completed connections.
 
+###### Preview
+
+![image](https://user-images.githubusercontent.com/48471743/221910817-bac619e6-dd67-4fab-9c78-764979d9d70f.png)
+

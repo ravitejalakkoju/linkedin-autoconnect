@@ -1,5 +1,5 @@
 import { getActiveTabURL } from '../scripts/utils.js';
-import { RequestStatus, ActionButtonView } from './types.js';
+import { RequestStatus, ActionButtonView, EventAction } from './types.js';
 
 let currentRequestStatus = RequestStatus.NONE,
     actionButtonElement = document.getElementById('js-button-action'),
@@ -10,14 +10,15 @@ let currentRequestStatus = RequestStatus.NONE,
     loaderCircumference;
 
 const tab = await getActiveTabURL();
+let port = chrome.tabs.connect(tab.id, {name: "connections"});
+port.onMessage.addListener((response) => {
+  completedConnectionsCount = response;
+  setCountView();
+  if(completedConnectionsCount == allowedConnections)
+    completedLinkedInConnections();
+});
 
 setDefaultView();
-
-// var port = chrome.runtime.connect(null, {name: "connections"});
-// port.onMessage.addListener((response) => {
-//   console.log("Message received from content script: " + response);
-// });
-// port.postMessage({ action: 'start-connecting' });
 
 function manageLinkedInConnections() {
   const prevRequestStatus = currentRequestStatus;
@@ -40,41 +41,15 @@ function manageLinkedInConnections() {
 }
 
 async function startLinkedInConnections() {
-  startConnectionRequest()
-  .then(response => {
-    completedConnectionsCount = response;
-    setCountView()
-    completedLinkedInConnections();
-  });
-}
-
-async function startConnectionRequest() {
-  return await chrome.tabs.sendMessage(tab.id, { action: 'start-connecting' });
-  // await port.postMessage({ action: 'start-connecting' });
+  await port.postMessage({ action: 'start-connecting' });
 }
 
 async function resumeLinkedInConnections() {
-  resumeConnectionRequest()
-  .then(response => {
-    completedLinkedInConnections();
-  });
-}
-
-async function resumeConnectionRequest() {
-  return await chrome.tabs.sendMessage(tab.id, { action: 'resume-connecting' });
-  // await port.postMessage({ action: 'resume-connecting' });
+  await port.postMessage({ action: 'resume-connecting' });
 }
 
 async function stopLinkedInConnections() {
-  stopConnectionRequest()
-  .then(response => {
-    completedLinkedInConnections();
-  });
-}
-
-async function stopConnectionRequest() {
-  return await chrome.tabs.sendMessage(tab.id, { action: 'stop-connecting' });
-  // await port.postMessage({ action: 'stop-connecting' });
+  await port.postMessage({ action: 'stop-connecting' });
 }
 
 function completedLinkedInConnections() {

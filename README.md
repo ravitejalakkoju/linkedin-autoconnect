@@ -36,7 +36,7 @@ chromes://extensions
 - Navigate to the directory where you cloned the GitHub repository.
 - Select the root directory of the repository (the one containing the manifest.json file).
 - Click on "Select folder" to load the extension.
-
+- Now pin the extension by selecting the extension icon on the top right corner of chrome.
 - Now go to [LinkedIn](https://www.linkedin.com/search/results/people/) and search for the profiles you want to connect with.
 - Click the extension icon to open the popup.
 - Click the "Start Connecting" button in the popup to initiate the connection process.

@@ -11,7 +11,10 @@
 		if(connectionsPort.name === 'connections') {
 			port = connectionsPort;
 			port.onMessage.addListener(function(request) {
-				if(request.action === 'get-default-data') {
+				if(request.action === 'establish-connection') {
+					port.postMessage({message: 'portConnected'})
+				}	
+				else if(request.action === 'get-default-data') {
 					completedConnectionsCount = 10 - getConnectBtnList().length;
 					port.postMessage({message: 'default', completedConnectionsCount, percent: calculatePercent()});
 				}
@@ -28,10 +31,6 @@
 
 				      			completedConnectionsCount++;
 								port.postMessage({message: 'connected', completedConnectionsCount, totalConnections, percent: calculatePercent()});
-
-								if(completedConnectionsCount === totalConnections) {
-				      				port.postMessage({message: 'completed'});
-				      			}
 			      			}, 0);
 			      		})
 					});
@@ -41,6 +40,10 @@
 
 						setTimeout(() => {
 							if(isHalted) return;
+							if(completedConnectionsCount === totalConnections) {
+				      			port.postMessage({message: 'completed'});
+				      			return;
+				      		}
 							connectBtn.click();
 						}, i * 250);
 					}

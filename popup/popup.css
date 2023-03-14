@@ -39,6 +39,7 @@ body {
   align-items: center;
   justify-content: start;
   font-size: 1.25rem;
+  position: relative;
 }
 
 .fw-300 {
@@ -79,6 +80,17 @@ body {
 .btn-close {
   background-color: transparent;
   margin-left: 0.5rem;
+}
+
+.port-connection-status {
+  width: 0.35rem;
+  height: 0.35rem;
+  background-color: red;
+  display: inline-block;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  right: -0.5rem;
 }
 
 i {

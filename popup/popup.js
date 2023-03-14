@@ -4,17 +4,22 @@ import { RequestStatus, ActionButtonView } from './types.js';
 let currentRequestStatus = RequestStatus.NONE,
     actionButtonElement = document.getElementById('js-button-action'),
     closeButtonElement = document.getElementById('js-btn-close'),
-    circle = document.querySelector('circle');
+    circle = document.querySelector('circle'), 
+    portConnected = false;
 
 setLoaderView();
 
 const tab = await getActiveTabURL();
 let port = chrome.tabs.connect(tab.id, {name: "connections"});
-port.postMessage({ action: 'get-default-data' });
+port.postMessage({ action: 'establish-connection' });
 
 port.onMessage.addListener((response) => {
-  if(response.message === 'default' || response.message === 'connected') {
-    setCurrentRequestStatus(response.completedConnectionsCount);
+  if(response.message == 'portConnected') {
+    portConnected = true;
+    setConnectionStatus(portConnected);
+    port.postMessage({ action: 'get-default-data' });
+  }
+  else if(response.message === 'default' || response.message === 'connected') {
     setCountView(response.completedConnectionsCount);
     setProgressView(response.percent);
     if(response.percent === 100) {
@@ -70,8 +75,8 @@ function completedLinkedInConnections() {
   showSuccessNotification();
 }
 
-function setCurrentRequestStatus(completedConnectionsCount) {
-
+function setConnectionStatus(isConnected) {
+  document.getElementById('js-port-connection-status').style.backgroundColor = isConnected ? 'green' : 'red';
 }
 
 // Views

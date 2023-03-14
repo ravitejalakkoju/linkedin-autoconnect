@@ -10,31 +10,38 @@ let currentRequestStatus = RequestStatus.NONE,
 setLoaderView();
 
 const tab = await getActiveTabURL();
-let port = chrome.tabs.connect(tab.id, {name: "connections"});
-port.postMessage({ action: 'establish-connection' });
+let port;
 
-port.onMessage.addListener((response) => {
-  if(response.message == 'portConnected') {
-    portConnected = true;
-    setConnectionStatus(portConnected);
-    port.postMessage({ action: 'get-default-data' });
+if(tab.url.includes('linkedin.com/search/results/people')) {
+  try {
+    port = chrome.tabs.connect(tab.id, {name: "connections"});
+    port.postMessage({ action: 'establish-connection' });
+    port.onMessage.addListener((response) => {
+      if(response.message == 'portConnected') {
+        portConnected = true;
+        setConnectionStatus(portConnected);
+        port.postMessage({ action: 'get-default-data' });
+      }
+      else if(response.message === 'default' || response.message === 'connected') {
+        setCountView(response.completedConnectionsCount);
+        setProgressView(response.percent);
+        if(response.percent === 100) {
+          disableButton(actionButtonElement);
+        }
+      }
+      else if(response.message === 'stopped') {
+        disableButton(actionButtonElement);
+        setTimeout(() => {
+          enableButton(actionButtonElement);
+        }, response.pendingConnections * 250 + 250);
+      }
+      else if(response.message === 'completed')
+        completedLinkedInConnections();
+    });
+  } catch (error) {
+    console.error('Error connecting to tab:', error);
   }
-  else if(response.message === 'default' || response.message === 'connected') {
-    setCountView(response.completedConnectionsCount);
-    setProgressView(response.percent);
-    if(response.percent === 100) {
-      disableButton(actionButtonElement);
-    }
-  }
-  else if(response.message === 'stopped') {
-    disableButton(actionButtonElement);
-    setTimeout(() => {
-      enableButton(actionButtonElement);
-    }, response.pendingConnections * 250 + 250);
-  }
-  else if(response.message === 'completed')
-    completedLinkedInConnections();
-});
+}
 
 function manageLinkedInConnections() {
   const prevRequestStatus = currentRequestStatus;
@@ -57,14 +64,17 @@ function manageLinkedInConnections() {
 }
 
 async function startLinkedInConnections() {
+  if(!port) return;
   await port.postMessage({ action: 'start-connecting' });
 }
 
 async function resumeLinkedInConnections() {
+  if(!port) return;
   await port.postMessage({ action: 'resume-connecting' });
 }
 
 async function stopLinkedInConnections() {
+  if(!port) return;
   await port.postMessage({ action: 'stop-connecting' });
 }
 
